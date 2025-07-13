@@ -58,3 +58,30 @@ print(f"R-squared (R2): {r2:.2f}")
 # Create a new data point (e.g., a house with a specific area and number of rooms).
 # Use the trained model to predict its price.
 # Remember that the model expects the data in the same format as the training data.
+
+# Example new data point
+new_house_data = {
+    'LotArea': [8500], # Example LotArea
+    'TotRmsAbvGrd': [7], # Example TotRmsAbvGrd
+    'Neighborhood': ['CollgCr'] # Example Neighborhood
+}
+
+new_house_df = pd.DataFrame(new_house_data)
+
+# Apply one-hot encoding to the new data's Neighborhood
+new_house_categorical = pd.get_dummies(new_house_df['Neighborhood'], prefix='Neighborhood')
+
+# Combine numerical features with one-hot encoded categorical features for the new data
+new_house_features = pd.concat([
+    new_house_df[['LotArea', 'TotRmsAbvGrd']],
+    new_house_categorical
+], axis=1)
+
+# Ensure the new data has all the same columns as the training data (X)
+# Fill missing columns (neighborhoods not in new_house_data) with 0
+new_house_features = new_house_features.reindex(columns=X.columns, fill_value=0)
+
+# Make the prediction
+predicted_price = reg.predict(new_house_features)
+
+print(f"\nPredicted price for the new house: ${predicted_price[0]:,.2f}")
