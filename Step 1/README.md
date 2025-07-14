@@ -34,7 +34,21 @@ House prices are influenced by a multitude of factors. Beyond the basic `LotArea
 
 *   **Derived Features (Feature Engineering)**: Creating new features from existing ones (e.g., `AgeOfHouse = current_year - YearBuilt`, `TotalSF = GrLivArea + TotalBsmtSF`).
 
-## 3. Regression Model Evaluation Metrics
+## 3. Handling Categorical Features
+
+Categorical features (like `Neighborhood`) must be converted into a numerical format before they can be used by most machine learning models. Choosing the right method is crucial as it can impact model performance. Here are several common techniques:
+
+| Method | How It Works | Pros | Cons |
+| :--- | :--- | :--- | :--- |
+| **One-Hot Encoding** | Creates a new binary (0 or 1) column for each unique category in the original feature. | Avoids creating a false sense of order between categories. Easy to understand and implement. | Can lead to a very high number of features (the "curse of dimensionality") if the original feature has many categories. |
+| **Label Encoding** | Assigns a unique integer to each category (e.g., 'NeighborhoodA' -> 0, 'NeighborhoodB' -> 1). | Simple and requires no new features. | Creates an arbitrary order (e.g., 2 > 1) that can mislead models like linear regression into thinking there's a ranking. |
+| **Dummy Coding** | Creates `k-1` new binary columns for `k` categories. One category is chosen as the "baseline" and is represented by all zeros. | Avoids multicollinearity, which is important for some statistical models. | The interpretation of the coefficients becomes relative to the baseline category. |
+| **Target Encoding** | Replaces each category with the average value of the target variable for that category (e.g., replace 'NeighborhoodA' with the mean `SalePrice` for all houses in NeighborhoodA). | Can be highly predictive as it directly uses information from the target. Doesn't increase feature count. | High risk of overfitting, especially with rare categories. Requires careful implementation to prevent data leakage from the test set. |
+| **Hashing Encoder** | Uses a hash function to convert categories into a fixed, smaller number of numerical features. | Memory efficient and fast, especially for features with thousands of categories (high cardinality). | Hash collisions (different categories mapped to the same value) can cause information loss. The resulting features are not interpretable. |
+
+In this project, we used **One-Hot Encoding** as it is a safe and effective default choice for a feature like `Neighborhood` which doesn't have too many unique categories.
+
+## 4. Regression Model Evaluation Metrics
 
 To assess how well a regression model performs, we use various metrics. Each provides a different perspective on the model's error and fit:
 
@@ -58,7 +72,7 @@ To assess how well a regression model performs, we use various metrics. Each pro
     *   **Formula**: Average of the absolute percentage errors.
     *   **Interpretation**: Expresses error as a percentage of the actual value, intuitive for business contexts. Sensitive to zero or near-zero actual values.
 
-## 4. Other Regression Models
+## 5. Other Regression Models
 
 While Linear Regression is a fundamental starting point, many other algorithms can be used for regression tasks, often offering better performance for complex datasets:
 
